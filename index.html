@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cocoa thesis tracker</title>
+<meta name="description" content="Long-cocoa 2027 thesis: kill criteria, scenarios, Ivorian arrivals and catalysts.">
+<style>
+:root{
+  --bg:#faf9f5;--panel:#fff;--fg:#1f1e1d;--muted:#6b6a66;--line:#e6e3da;
+  --accent:#c2410c;--ok:#15803d;--warn:#b45309;--bad:#b91c1c;--chart-muted:#c9c5ba;--grid:#eeebe3;
+  --serif:Georgia,"Times New Roman",serif;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#1a1918;--panel:#242321;--fg:#ece9e2;--muted:#a19e96;--line:#3a3835;
+  --accent:#f0884e;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--chart-muted:#5a5852;--grid:#2f2e2b;}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);line-height:1.5}
+main{max-width:1100px;margin:0 auto;padding:40px 20px 60px}
+h1{font-family:var(--serif);font-weight:400;font-size:2rem;margin:0 0 6px}
+h2{font-size:1.05rem;font-weight:600;margin:0 0 4px}
+.lead{color:var(--muted);margin:0 0 6px}
+.stamp{font-size:.8rem;color:var(--muted);margin:0 0 28px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,11rem),1fr));gap:14px;margin-bottom:24px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px}
+.lbl,.sub,.note{font-size:.8rem;color:var(--muted)}
+.big{font-family:var(--serif);font-size:1.9rem;font-variant-numeric:tabular-nums;margin-top:4px}
+.sub{margin-top:4px}
+.note{margin:0 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));gap:14px;margin-bottom:24px}
+.mb{margin-bottom:24px}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{text-align:left;color:var(--muted);font-weight:600;border-bottom:1px solid var(--line);padding:6px 10px 6px 0}
+td{border-bottom:1px solid var(--line);padding:9px 10px 9px 0;vertical-align:top}
+.pill{display:inline-block;padding:0 9px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}
+.pill.ok{color:var(--ok)}.pill.watch{color:var(--warn)}.pill.bad{color:var(--bad)}
+.chart{position:relative;min-height:220px}
+.chart svg{display:block;width:100%;height:auto;font-size:12px}
+.tip{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.12);padding:5px 9px;font-size:.78rem;display:none;white-space:nowrap}
+.tip div:first-child{color:var(--muted)}
+footer{font-size:.78rem;color:var(--muted);margin-top:28px}
+@media (max-width:40rem){.hide-narrow{display:none}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Cocoa thesis tracker</h1>
+  <p class="lead"><span id="l-trig">—</span> of <span id="l-total">—</span> kill criteria triggered, <span id="l-watch">—</span> on watch: the long-2027 thesis stands.</p>
+  <p class="stamp">Data snapshot as of 22 Oct 2026. Not updated automatically.</p>
+
+  <div class="tiles">
+    <div class="card"><div class="lbl">NY cocoa, front month (USD/t)</div><div class="big" id="t-spot">—</div><div class="sub">As of <span id="t-spot-date">—</span></div></div>
+    <div class="card"><div class="lbl">Probability-weighted value (USD/t)</div><div class="big" id="t-ev">—</div><div class="sub"><span id="t-ev-vs">—</span> vs spot</div></div>
+    <div class="card"><div class="lbl">Kill criteria on watch</div><div class="big" id="t-watch">—</div><div class="sub">Triggered: <span id="t-trig">—</span></div></div>
+    <div class="card"><div class="lbl">Next dated catalyst</div><div class="big" id="t-next" style="font-size:1.25rem">—</div><div class="sub" id="t-next-ev">—</div></div>
+  </div>
+
+  <div class="card mb">
+    <h2>Kill criteria</h2>
+    <p class="note">Exit the position if any row turns Triggered. Status is an analyst read of the latest data.</p>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>Signal</th><th>Kill if</th><th>Latest reading</th><th>Status</th><th class="hide-narrow">As of</th><th class="hide-narrow">Next check</th></tr></thead>
+      <tbody id="kill"></tbody>
+    </table></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Scenario ranges vs spot</h2>
+      <p class="note">NY price range per scenario; dot = midpoint, dashed line = spot. Probabilities in labels.</p>
+      <div class="chart" id="scen"></div>
+    </div>
+    <div class="card">
+      <h2>Ivorian arrivals, season to date (kt)</h2>
+      <p class="note">2026/27 season from 1 Sep. CCC guides ~900 kt Oct–Dec vs 1.1 Mt last year.</p>
+      <div class="chart" id="arr"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Catalysts</h2>
+    <p class="note">In date order. "Bull read" is the outcome that supports the thesis.</p>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>When</th><th>Event</th><th>Bull read</th></tr></thead>
+      <tbody id="cat"></tbody>
+    </table></div>
+  </div>
+
+  <footer>
+    Sources: Reuters, Trading Economics, Barchart, ECA, StoneX and Ivorian weather agency reporting, as of 22 Oct 2026. Scenario ranges and probabilities and the kill-criteria status calls are analyst judgement, not market data. This is an analytical framework, not investment advice.
+  </footer>
+</main>
+
+<script>
+const DATA = {
+  price: [{date:"2026-10-22", usd:5700}],
+  scenarios: [
+    {scenario:"Bull", prob:0.30, low:7500, high:8000},
+    {scenario:"Base", prob:0.45, low:5500, high:6500},
+    {scenario:"Bear", prob:0.25, low:4000, high:4500}
+  ],
+  arrivals: [
+    {week_end:"2026-09-13", kt:26},
+    {week_end:"2026-10-04", kt:54.5},
+    {week_end:"2026-10-11", kt:77.5}
+  ],
+  kill: [
+    {signal:"Ivorian port arrivals", kill_if:"Cumulative within ~10% of last season by end-Dec 2026", latest:"77.5 kt season-to-date (to ~11 Oct); CCC guides ~900 kt Oct–Dec vs 1.1 Mt last year", status:"OK", as_of:"2026-10-12", next_check:"Weekly, Mondays"},
+    {signal:"ICE certified stocks", kill_if:"Rising steadily through Q4 2026", latest:"3.31m bags in Jul 2026, a 2-year high", status:"Watch", as_of:"2026-07-24", next_check:"ICE daily"},
+    {signal:"European grindings", kill_if:"Q4 2026 negative y/y", latest:"Q3 +3.2% y/y to 348,215 t (consensus −3.9%)", status:"OK", as_of:"2026-10-15", next_check:"Mid-Jan 2027 (ECA)"},
+    {signal:"Ivorian crop estimate", kill_if:"Raised to ≥2.0 Mt", latest:"1.7–1.8 Mt (StoneX ~1.8 Mt) vs ~2.2 Mt in 2025/26", status:"OK", as_of:"2026-10-12", next_check:"StoneX / CCC updates"},
+    {signal:"Mid-crop weather", kill_if:"Good rains through the Dec–Feb dry season", latest:"Ivorian weather agency sees below-average rain into early 2027", status:"OK", as_of:"2026-10-12", next_check:"Dec 2026–Feb 2027"}
+  ],
+  catalysts: [
+    {when:"Weekly, Mondays", sort:"2026-10-26", event:"Ivorian arrivals", bull_read:"Season-to-date stays well below last year"},
+    {when:"Nov–Dec 2026", sort:"2026-11-15", event:"Peak main-crop arrivals", bull_read:"Flush smaller than the ~900 kt CCC guide"},
+    {when:"Dec 2026", sort:"2026-12-30", event:"EUDR applies (unless delayed again)", bull_read:"Traceability gaps delay EU-bound shipments"},
+    {when:"Mid-Jan 2027", sort:"2027-01-15", event:"Q4 grindings (Europe, Asia, N. America)", bull_read:"Second positive quarter in Europe"},
+    {when:"Jan 2027", sort:"2027-01-10", event:"Bloomberg Commodity Index rebalance", bull_read:"Passive inflows"},
+    {when:"Feb 2027", sort:"2027-02-20", event:"First ICCO 2026/27 balance estimate", bull_read:"Surplus cut or deficit"},
+    {when:"Mar–Apr 2027", sort:"2027-03-31", event:"Ivorian mid-crop farmgate decision", bull_read:"Price held low; input use stays depressed"}
+  ]
+};
+
+const $ = id => document.getElementById(id);
+const int = n => Math.round(n).toLocaleString("en-US");
+const pct = n => (n >= 0 ? "+" : "") + (n * 100).toFixed(1) + "%";
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const dlong = s => { const [y,m,d] = s.split("-").map(Number); return d + " " + MON[m-1] + " " + y; };
+const dshort = s => { const [, m, d] = s.split("-").map(Number); return MON[m-1] + " " + d; };
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent, text){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; if (parent) parent.appendChild(e); return e; }
+
+// Derived figures
+const spot = DATA.price[0].usd;
+const ev = DATA.scenarios.reduce((s, r) => s + r.prob * (r.low + r.high) / 2, 0);
+const trig = DATA.kill.filter(r => r.status === "Triggered").length;
+const watch = DATA.kill.filter(r => r.status === "Watch").length;
+const today = new Date().toISOString().slice(0, 10);
+const next = DATA.catalysts.filter(r => !r.when.startsWith("Weekly") && r.sort >= today).sort((a, b) => a.sort < b.sort ? -1 : 1)[0];
+
+$("l-trig").textContent = trig; $("l-total").textContent = DATA.kill.length; $("l-watch").textContent = watch;
+$("t-spot").textContent = int(spot); $("t-spot-date").textContent = dlong(DATA.price[0].date);
+$("t-ev").textContent = int(ev); $("t-ev-vs").textContent = pct(ev / spot - 1);
+$("t-watch").textContent = watch; $("t-trig").textContent = trig;
+$("t-next").textContent = next ? next.when : "—"; $("t-next-ev").textContent = next ? next.event : "No dated catalysts left";
+
+// Tables
+const order = {Triggered:0, Watch:1, OK:2};
+[...DATA.kill].sort((a, b) => (order[a.status] ?? 3) - (order[b.status] ?? 3)).forEach(r => {
+  const tr = document.createElement("tr");
+  const add = (t, cls) => { const td = document.createElement("td"); if (cls) td.className = cls; td.textContent = t; tr.appendChild(td); return td; };
+  add(r.signal); add(r.kill_if); add(r.latest);
+  const p = document.createElement("span"); p.className = "pill " + (r.status === "Triggered" ? "bad" : r.status === "Watch" ? "watch" : "ok"); p.textContent = r.status; add("").appendChild(p);
+  add(dlong(r.as_of), "hide-narrow"); add(r.next_check, "hide-narrow");
+  $("kill").appendChild(tr);
+});
+[...DATA.catalysts].sort((a, b) => a.sort < b.sort ? -1 : 1).forEach(r => {
+  const tr = document.createElement("tr");
+  [r.when, r.event, r.bull_read].forEach(t => { const td = document.createElement("td"); td.textContent = t; tr.appendChild(td); });
+  $("cat").appendChild(tr);
+});
+
+// Tooltip helper
+function tip(box){ let t = box.querySelector(".tip"); if (!t){ t = document.createElement("div"); t.className = "tip"; box.appendChild(t);} return t; }
+function showTip(box, lines, evt){
+  const t = tip(box); t.textContent = "";
+  lines.forEach(l => { const d = document.createElement("div"); d.textContent = l; t.appendChild(d); });
+  t.style.display = "block";
+  const r = box.getBoundingClientRect(), x = evt.clientX - r.left, y = evt.clientY - r.top;
+  t.style.left = Math.max(0, Math.min(box.clientWidth - t.offsetWidth, x - t.offsetWidth / 2)) + "px";
+  t.style.top = Math.max(0, y - t.offsetHeight - 10) + "px";
+}
+function hideTip(box){ tip(box).style.display = "none"; }
+function niceTicks(lo, hi, n){
+  const step0 = (hi - lo) / n, mag = Math.pow(10, Math.floor(Math.log10(step0))), f = step0 / mag;
+  const step = (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * mag, out = [];
+  for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(v);
+  return out;
+}
+
+function drawScen(){
+  const box = $("scen"); box.querySelectorAll("svg").forEach(n => n.remove());
+  const rows = DATA.scenarios, W = Math.max(280, box.clientWidth), H = 220, m = {l:72, r:16, t:22, b:28};
+  const lo = Math.min(...rows.map(r => r.low), spot) - 500, hi = Math.max(...rows.map(r => r.high), spot) + 500;
+  const x = v => m.l + (v - lo) / (hi - lo) * (W - m.l - m.r);
+  const band = (H - m.t - m.b) / rows.length, yc = i => m.t + band * (i + .5);
+  const svg = el("svg", {viewBox:`0 0 ${W} ${H}`}, box);
+  el("line", {x1:m.l, x2:W - m.r, y1:H - m.b, y2:H - m.b, stroke:css("--line")}, svg);
+  niceTicks(lo, hi, Math.max(3, Math.floor(W / 110))).forEach(v => {
+    el("line", {x1:x(v), x2:x(v), y1:H - m.b, y2:H - m.b + 4, stroke:css("--line")}, svg);
+    el("text", {x:x(v), y:H - 8, "text-anchor":"middle", fill:css("--muted")}, svg, int(v));
+  });
+  el("line", {x1:x(spot), x2:x(spot), y1:m.t - 6, y2:H - m.b, stroke:css("--muted"), "stroke-dasharray":"4 4"}, svg);
+  el("text", {x:x(spot) + 4, y:m.t - 8, fill:css("--muted")}, svg, "Spot " + int(spot));
+  rows.forEach((r, i) => {
+    const c = r.scenario === "Bull" ? css("--accent") : css("--chart-muted"), mid = (r.low + r.high) / 2;
+    el("text", {x:m.l - 8, y:yc(i) + 4, "text-anchor":"end", fill:css("--fg")}, svg, `${r.scenario} ${Math.round(r.prob * 100)}%`);
+    el("line", {x1:x(r.low), x2:x(r.high), y1:yc(i), y2:yc(i), stroke:c, "stroke-width":6, "stroke-linecap":"round"}, svg);
+    el("circle", {cx:x(mid), cy:yc(i), r:5, fill:r.scenario === "Bull" ? css("--accent") : css("--muted")}, svg);
+    const hit = el("rect", {x:m.l, y:yc(i) - band / 2, width:W - m.l - m.r, height:band, fill:"transparent"}, svg);
+    hit.addEventListener("mousemove", e => showTip(box, [r.scenario, `${int(r.low)}–${int(r.high)} USD/t`, `Probability ${Math.round(r.prob * 100)}%`, `${pct(mid / spot - 1)} midpoint vs spot`], e));
+    hit.addEventListener("mouseleave", () => hideTip(box));
+  });
+}
+
+function drawArr(){
+  const box = $("arr"); box.querySelectorAll("svg").forEach(n => n.remove());
+  const rows = DATA.arrivals, W = Math.max(280, box.clientWidth), H = 220, m = {l:40, r:16, t:22, b:28};
+  const ticks = niceTicks(0, Math.max(...rows.map(r => r.kt)) * 1.15, 4), top = ticks[ticks.length - 1];
+  const y = v => H - m.b - v / top * (H - m.t - m.b);
+  const slot = (W - m.l - m.r) / rows.length, bw = Math.min(32, slot * .65);
+  const svg = el("svg", {viewBox:`0 0 ${W} ${H}`}, box);
+  ticks.forEach(v => {
+    el("line", {x1:m.l, x2:W - m.r, y1:y(v), y2:y(v), stroke:css("--grid")}, svg);
+    el("text", {x:m.l - 6, y:y(v) + 4, "text-anchor":"end", fill:css("--muted")}, svg, int(v));
+  });
+  rows.forEach((r, i) => {
+    const cx = m.l + slot * (i + .5);
+    const b = el("rect", {x:cx - bw / 2, y:y(r.kt), width:bw, height:y(0) - y(r.kt), rx:4, fill:i === rows.length - 1 ? css("--accent") : css("--chart-muted")}, svg);
+    b.addEventListener("mousemove", e => showTip(box, [dlong(r.week_end), `${r.kt.toFixed(1)} kt season to date`], e));
+    b.addEventListener("mouseleave", () => hideTip(box));
+    el("text", {x:cx, y:y(r.kt) - 6, "text-anchor":"middle", fill:css("--fg")}, svg, r.kt.toFixed(1));
+    el("text", {x:cx, y:H - 8, "text-anchor":"middle", fill:css("--muted")}, svg, dshort(r.week_end));
+  });
+}
+
+function draw(){ drawScen(); drawArr(); }
+draw();
+let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(draw, 150); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", draw);
+</script>
+</body>
+</html>
