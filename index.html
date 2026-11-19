@@ -45,8 +45,8 @@ footer{font-size:.78rem;color:var(--muted);margin-top:28px}
 <body>
 <main>
   <h1>Cocoa thesis tracker</h1>
-  <p class="lead"><span id="l-trig">—</span> of <span id="l-total">—</span> kill criteria triggered, <span id="l-watch">—</span> on watch: the long-2027 thesis stands.</p>
-  <p class="stamp">Data snapshot as of 22 Oct 2026. Not updated automatically.</p>
+  <p class="lead"><span id="l-trig">—</span> of <span id="l-total">—</span> kill criteria triggered, <span id="l-watch">—</span> on watch: <span id="l-verdict">—</span></p>
+  <p class="stamp">Data snapshot as of 19 Nov 2026 (prices to 18 Nov). Not updated automatically.</p>
 
   <div class="tiles">
     <div class="card"><div class="lbl">NY cocoa, front month (USD/t)</div><div class="big" id="t-spot">—</div><div class="sub">As of <span id="t-spot-date">—</span></div></div>
@@ -72,7 +72,7 @@ footer{font-size:.78rem;color:var(--muted);margin-top:28px}
     </div>
     <div class="card">
       <h2>Ivorian arrivals, season to date (kt)</h2>
-      <p class="note">2026/27 season from 1 Sep. CCC guides ~900 kt Oct–Dec vs 1.1 Mt last year.</p>
+      <p class="note">Cumulative from 1 Oct, Ivorian government data. Grey bars: same point last season.</p>
       <div class="chart" id="arr"></div>
     </div>
   </div>
@@ -87,39 +87,21 @@ footer{font-size:.78rem;color:var(--muted);margin-top:28px}
   </div>
 
   <footer>
-    Sources: Reuters, Trading Economics, Barchart, ECA, StoneX and Ivorian weather agency reporting, as of 22 Oct 2026. Scenario ranges and probabilities and the kill-criteria status calls are analyst judgement, not market data. This is an analytical framework, not investment advice.
+    Sources: Trading Economics, Barchart/Bloomberg, Reuters, ECA and Ivorian weather agency (Sodexam) reporting, as of 18 Nov 2026. The 1 Nov arrivals figure is derived from the 8 Nov total less that week. Scenario ranges and probabilities and the kill-criteria status calls are analyst judgement, not market data. This is an analytical framework, not investment advice.
   </footer>
 </main>
 
 <script>
 const DATA = {
-  price: [{date:"2026-10-22", usd:5700}],
+  price: [{"date": "2026-11-18", "usd": 5027}],
   scenarios: [
     {scenario:"Bull", prob:0.30, low:7500, high:8000},
     {scenario:"Base", prob:0.45, low:5500, high:6500},
     {scenario:"Bear", prob:0.25, low:4000, high:4500}
   ],
-  arrivals: [
-    {week_end:"2026-09-13", kt:26},
-    {week_end:"2026-10-04", kt:54.5},
-    {week_end:"2026-10-11", kt:77.5}
-  ],
-  kill: [
-    {signal:"Ivorian port arrivals", kill_if:"Cumulative within ~10% of last season by end-Dec 2026", latest:"77.5 kt season-to-date (to ~11 Oct); CCC guides ~900 kt Oct–Dec vs 1.1 Mt last year", status:"OK", as_of:"2026-10-12", next_check:"Weekly, Mondays"},
-    {signal:"ICE certified stocks", kill_if:"Rising steadily through Q4 2026", latest:"3.31m bags in Jul 2026, a 2-year high", status:"Watch", as_of:"2026-07-24", next_check:"ICE daily"},
-    {signal:"European grindings", kill_if:"Q4 2026 negative y/y", latest:"Q3 +3.2% y/y to 348,215 t (consensus −3.9%)", status:"OK", as_of:"2026-10-15", next_check:"Mid-Jan 2027 (ECA)"},
-    {signal:"Ivorian crop estimate", kill_if:"Raised to ≥2.0 Mt", latest:"1.7–1.8 Mt (StoneX ~1.8 Mt) vs ~2.2 Mt in 2025/26", status:"OK", as_of:"2026-10-12", next_check:"StoneX / CCC updates"},
-    {signal:"Mid-crop weather", kill_if:"Good rains through the Dec–Feb dry season", latest:"Ivorian weather agency sees below-average rain into early 2027", status:"OK", as_of:"2026-10-12", next_check:"Dec 2026–Feb 2027"}
-  ],
-  catalysts: [
-    {when:"Weekly, Mondays", sort:"2026-10-26", event:"Ivorian arrivals", bull_read:"Season-to-date stays well below last year"},
-    {when:"Nov–Dec 2026", sort:"2026-11-15", event:"Peak main-crop arrivals", bull_read:"Flush smaller than the ~900 kt CCC guide"},
-    {when:"Dec 2026", sort:"2026-12-30", event:"EUDR applies (unless delayed again)", bull_read:"Traceability gaps delay EU-bound shipments"},
-    {when:"Mid-Jan 2027", sort:"2027-01-15", event:"Q4 grindings (Europe, Asia, N. America)", bull_read:"Second positive quarter in Europe"},
-    {when:"Jan 2027", sort:"2027-01-10", event:"Bloomberg Commodity Index rebalance", bull_read:"Passive inflows"},
-    {when:"Feb 2027", sort:"2027-02-20", event:"First ICCO 2026/27 balance estimate", bull_read:"Surplus cut or deficit"},
-    {when:"Mar–Apr 2027", sort:"2027-03-31", event:"Ivorian mid-crop farmgate decision", bull_read:"Price held low; input use stays depressed"}
-  ]
+  arrivals: [{"week_end": "2026-11-01", "kt": 173.2, "prior_kt": 304.8}, {"week_end": "2026-11-08", "kt": 228.5, "prior_kt": 412.0}],
+  kill: [{"signal": "Ivorian port arrivals", "kill_if": "Cumulative within ~10% of last season by end-Dec 2026", "latest": "228.5 kt from 1 Oct to 8 Nov, −45% y/y (412.0 kt last year); week to 8 Nov 55.3 kt vs 107.1 kt", "status": "OK", "as_of": "2026-11-08", "next_check": "Weekly, Mondays"}, {"signal": "ICE certified stocks", "kill_if": "Rising steadily through Q4 2026", "latest": "3.82m bags on 18 Nov, a 2.5-year high; up from ~3.43m in late Sep and 3.31m in Jul", "status": "Triggered", "as_of": "2026-11-18", "next_check": "ICE daily"}, {"signal": "European grindings", "kill_if": "Q4 2026 negative y/y", "latest": "Q3 +3.2% y/y to 348,215 t (consensus −3.9%); N. America −2.5%, Asia +29%", "status": "OK", "as_of": "2026-10-15", "next_check": "Mid-Jan 2027 (ECA)"}, {"signal": "Ivorian crop estimate", "kill_if": "Raised to ≥2.0 Mt", "latest": "Trimmed to 1.8 Mt (−18% y/y); weather agency Sodexam warns of a 21–25% fall on El Niño", "status": "OK", "as_of": "2026-11-12", "next_check": "StoneX / CCC updates"}, {"signal": "Mid-crop weather", "kill_if": "Good rains through the Dec–Feb dry season", "latest": "Strong El Niño, dry conditions; trade sources see mid-crop −42–50% to 300–350 kt", "status": "OK", "as_of": "2026-11-18", "next_check": "Dec 2026–Feb 2027"}],
+  catalysts: [{"when": "Weekly, Mondays", "sort": "2026-11-23", "event": "Ivorian arrivals", "bull_read": "Season-to-date stays well below last year"}, {"when": "Nov–Dec 2026", "sort": "2026-11-15", "event": "Peak main-crop arrivals", "bull_read": "Flush smaller than the ~900 kt CCC guide"}, {"when": "Dec 2026", "sort": "2026-12-30", "event": "EUDR applies (unless delayed again)", "bull_read": "Traceability gaps delay EU-bound shipments"}, {"when": "Jan 2027", "sort": "2027-01-10", "event": "BCOM and S&P GSCI rebalance (cocoa weights being cut)", "bull_read": "Outflows smaller than feared, already priced"}, {"when": "Mid-Jan 2027", "sort": "2027-01-15", "event": "Q4 grindings (Europe, Asia, N. America)", "bull_read": "Second positive quarter in Europe"}, {"when": "Feb 2027", "sort": "2027-02-20", "event": "First ICCO 2026/27 balance estimate", "bull_read": "Surplus cut or deficit"}, {"when": "Mar–Apr 2027", "sort": "2027-03-31", "event": "Ivorian mid-crop farmgate decision", "bull_read": "Price held low; input use stays depressed"}]
 };
 
 const $ = id => document.getElementById(id);
@@ -140,7 +122,7 @@ const watch = DATA.kill.filter(r => r.status === "Watch").length;
 const today = new Date().toISOString().slice(0, 10);
 const next = DATA.catalysts.filter(r => !r.when.startsWith("Weekly") && r.sort >= today).sort((a, b) => a.sort < b.sort ? -1 : 1)[0];
 
-$("l-trig").textContent = trig; $("l-total").textContent = DATA.kill.length; $("l-watch").textContent = watch;
+$("l-trig").textContent = trig; $("l-verdict").textContent = trig > 0 ? "exit rule hit, review the position." : "the long-2027 thesis stands."; $("l-total").textContent = DATA.kill.length; $("l-watch").textContent = watch;
 $("t-spot").textContent = int(spot); $("t-spot-date").textContent = dlong(DATA.price[0].date);
 $("t-ev").textContent = int(ev); $("t-ev-vs").textContent = pct(ev / spot - 1);
 $("t-watch").textContent = watch; $("t-trig").textContent = trig;
@@ -208,9 +190,9 @@ function drawScen(){
 function drawArr(){
   const box = $("arr"); box.querySelectorAll("svg").forEach(n => n.remove());
   const rows = DATA.arrivals, W = Math.max(280, box.clientWidth), H = 220, m = {l:40, r:16, t:22, b:28};
-  const ticks = niceTicks(0, Math.max(...rows.map(r => r.kt)) * 1.15, 4), top = ticks[ticks.length - 1];
+  const ticks = niceTicks(0, Math.max(...rows.map(r => Math.max(r.kt, r.prior_kt || 0))) * 1.15, 4), top = ticks[ticks.length - 1];
   const y = v => H - m.b - v / top * (H - m.t - m.b);
-  const slot = (W - m.l - m.r) / rows.length, bw = Math.min(32, slot * .65);
+  const slot = (W - m.l - m.r) / rows.length, bw = Math.min(28, slot * .3);
   const svg = el("svg", {viewBox:`0 0 ${W} ${H}`}, box);
   ticks.forEach(v => {
     el("line", {x1:m.l, x2:W - m.r, y1:y(v), y2:y(v), stroke:css("--grid")}, svg);
@@ -218,10 +200,18 @@ function drawArr(){
   });
   rows.forEach((r, i) => {
     const cx = m.l + slot * (i + .5);
-    const b = el("rect", {x:cx - bw / 2, y:y(r.kt), width:bw, height:y(0) - y(r.kt), rx:4, fill:i === rows.length - 1 ? css("--accent") : css("--chart-muted")}, svg);
-    b.addEventListener("mousemove", e => showTip(box, [dlong(r.week_end), `${r.kt.toFixed(1)} kt season to date`], e));
+    if (r.prior_kt != null) {
+      const pb = el("rect", {x:cx - bw - 2, y:y(r.prior_kt), width:bw, height:y(0) - y(r.prior_kt), rx:4, fill:css("--chart-muted")}, svg);
+      pb.addEventListener("mousemove", e => showTip(box, [dshort(r.week_end) + ", last season", `${r.prior_kt.toFixed(1)} kt`], e));
+      pb.addEventListener("mouseleave", () => hideTip(box));
+      el("text", {x:cx - bw / 2 - 2, y:y(r.prior_kt) - 6, "text-anchor":"middle", fill:css("--muted")}, svg, Math.round(r.prior_kt));
+    }
+    const b = el("rect", {x:cx + 2, y:y(r.kt), width:bw, height:y(0) - y(r.kt), rx:4, fill:css("--accent")}, svg);
+    const lines = [dlong(r.week_end), `${r.kt.toFixed(1)} kt season to date`];
+    if (r.prior_kt != null) lines.push(`${pct(r.kt / r.prior_kt - 1).replace(".0%","%")} vs last season`);
+    b.addEventListener("mousemove", e => showTip(box, lines, e));
     b.addEventListener("mouseleave", () => hideTip(box));
-    el("text", {x:cx, y:y(r.kt) - 6, "text-anchor":"middle", fill:css("--fg")}, svg, r.kt.toFixed(1));
+    el("text", {x:cx + 2 + bw / 2, y:y(r.kt) - 6, "text-anchor":"middle", fill:css("--fg")}, svg, r.kt.toFixed(1));
     el("text", {x:cx, y:H - 8, "text-anchor":"middle", fill:css("--muted")}, svg, dshort(r.week_end));
   });
 }
